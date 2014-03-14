@@ -1,6 +1,6 @@
 
-project1: asa_project1.cpp
-	g++ -O3 -ansi -Wall -o project1 asa_project1.cpp -lm 
+project1: main.cpp
+	g++ -O3 -ansi -Wall -o project1 main.cpp -lm
 
-clean: 
+clean:
 	$(RM) project1
