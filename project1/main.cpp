@@ -56,11 +56,10 @@ int main(){
     /*cout << n << " " << p << "\n";
     cout << n << "\n";
     cout << p << "\n"; */
-    
+
 
     return 0;
 }
-
 
 /*
 
