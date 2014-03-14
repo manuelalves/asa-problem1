@@ -1,5 +1,3 @@
-/* g++ -O3 -ansi -Wall asa_project1.cpp -lm */
-
 #include <iostream>
 
 using namespace std;
