@@ -22,7 +22,7 @@ class userNode{
 
 // apply Tarjan Algorithm to a node
 vector<list<int> > Tarjan_Visit(userNode* actual_node, list<int> L, vector<userNode*> user_vector){
-      int visited = actual_node->visited;
+ int visited = actual_node->visited;
 
       userNode* v = NULL;
 
@@ -33,46 +33,55 @@ vector<list<int> > Tarjan_Visit(userNode* actual_node, list<int> L, vector<userN
       actual_node->low = visited;
       actual_node->visited = (visited + 1);
 
+
+
       L.push_back(actual_node->id);
+
 
 
       list<int>::iterator adj;
 
+      //userNode* copy_node = actual_node;
+
       //search in the adjacent nodes list of actual node
-      for(adj = actual_node->sharedList.begin(); adj!= actual_node->sharedList.end(); ++adj){
+      for(adj = actual_node->sharedList.begin(); adj!= actual_node->sharedList.end(); adj++){
 
             list<int>::iterator pos;
             int shared_node = *adj;
 
-            v = user_vector[shared_node];  //ver se indices tao bem ou se -1
+
+            v = user_vector[shared_node-1];  //ver se indices tao bem ou se -1
 
             pos = find(L.begin(), L.end(), shared_node);           //finds position of element v
 
 
-           if((v->d == -1) || (pos != L.end())){
+          if((v->d == -1) || (pos != L.end())){
                if(v->d == -1){
                    Tarjan_Visit(v, L, user_vector);
-              }
+    }
+
               actual_node->low = min(actual_node->low, v->low);
           }
       }
+
 
       if(actual_node->d == actual_node->low){
 
           list<int> people;
 
-          while(actual_node != v){
+          while((actual_node->id) != (v->id)){
               v->id= L.back();
               people.push_back(v->id);
               L.pop_back();
           }
 
           SCC.push_back(people);
+
       }
 
       return SCC;
-}
 
+}
 
 
 
@@ -116,6 +125,9 @@ int main(){
         userVector[auxN-1]->visited = 0;
         userVector[auxN-1]->sharedList.push_back(auxP);
     }
+
+    //cout << "vector 0 id" << (userVector[0]->d) << "\n";
+    //cout << "vector 1 id" << (userVector[1]->low) << "\n";
 
     SCC_output.reserve(n);
 
