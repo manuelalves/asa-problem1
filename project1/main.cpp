@@ -5,6 +5,12 @@
 
 using namespace std;
 
+// number of people (n)
+int n = 0;
+
+// number of shares (p)
+int p = 0;
+
 class userNode{
       public:
           int id;
@@ -15,8 +21,13 @@ class userNode{
 };
 
 // apply Tarjan Algorithm to a node
-void Tarjan_Visit(userNode* actual_node, list<int> L, vector<userNode*> user_vector){
+vector<list<int> > Tarjan_Visit(userNode* actual_node, list<int> L, vector<userNode*> user_vector){
       int visited = actual_node->visited;
+
+      userNode* v = NULL;
+
+      vector<list<int> > SCC;
+      SCC.reserve(n);
 
       actual_node->d = visited;
       actual_node->low = visited;
@@ -33,19 +44,33 @@ void Tarjan_Visit(userNode* actual_node, list<int> L, vector<userNode*> user_vec
             list<int>::iterator pos;
             int shared_node = *adj;
 
-            userNode* v = user_vector[shared_node];  //ver se indices tao bem ou se -1
+            v = user_vector[shared_node];  //ver se indices tao bem ou se -1
 
             pos = find(L.begin(), L.end(), shared_node);           //finds position of element v
 
 
-
            if((v->d == -1) || (pos != L.end())){
                if(v->d == -1){
-            //Tarjan_Visit();
+                   Tarjan_Visit(v, L, user_vector);
               }
+              actual_node->low = min(actual_node->low, v->low);
           }
       }
 
+      if(actual_node->d == actual_node->low){
+
+          list<int> people;
+
+          while(actual_node != v){
+              v->id= L.back();
+              people.push_back(v->id);
+              L.pop_back();
+          }
+
+          SCC.push_back(people);
+      }
+
+      return SCC;
 }
 
 
@@ -53,17 +78,15 @@ void Tarjan_Visit(userNode* actual_node, list<int> L, vector<userNode*> user_vec
 
 int main(){
 
-    // number of people (n)
-    int n = 0;
 
-    // number of shares (p)
-    int p = 0;
 
     // list of nodes visited (empty)
     list<int> L;
 
     // users vector
     vector<userNode*> userVector;
+
+    vector<list<int> > SCC_output;
 
     userNode* node = NULL;
 
@@ -94,13 +117,18 @@ int main(){
         userVector[auxN-1]->sharedList.push_back(auxP);
     }
 
+    SCC_output.reserve(n);
 
     for (int k = 0; k < p; k++){
         if(userVector[k]->d == -1){
-            Tarjan_Visit(userVector[k], L, userVector);
+            SCC_output = Tarjan_Visit(userVector[k], L, userVector);
         }
     }
 
+    // write output
+
+    cout << SCC_output.size() << "\n";
+    /*cout << p << "\n"; */
 
     //
 
