@@ -1,22 +1,52 @@
 #include <iostream>
 #include <list>
 #include <vector>
+#include <algorithm>
 
 using namespace std;
 
 class userNode{
   public:
+    int id;
     int d;
     int low;
     int visited;
     list<int> sharedList;
 };
 
-//List SCC_Tarjan(vector<list<int> >* userVector){
-  //return 0;
-//}
+// apply Tarjan Algorithm to a node
+void Tarjan_Visit(userNode* actual_node, list<int> L, vector<userNode*> user_vector){
+  int visited = actual_node->visited;
 
-void Tarjan_Visit(userNode* node, list<int> L){
+  actual_node->d = visited;
+  actual_node->low = visited;
+  actual_node->visited = (visited + 1);
+
+  L.push_back(actual_node->id);
+
+
+  list<int>::iterator adj;
+
+  //search in the adjacent nodes list of actual node
+  for(adj = actual_node->sharedList.begin(); adj!= actual_node->sharedList.end(); ++adj){
+
+    list<int>::iterator pos;
+    int shared_node = *adj;
+
+    userNode* v = user_vector[shared_node];  //ver se indices tao bem ou se -1
+
+    pos = find(L.begin(), L.end(), shared_node);           //finds position of element v
+
+
+
+   if((v->d == -1) || (pos != L.end())){
+      if(v->d == -1){
+        //Tarjan_Visit();
+      }
+    }
+  }
+
+
 
 }
 
@@ -35,7 +65,6 @@ int main(){
     list<int> L;
 
     // users vector
-    //vector<list<int> > userVector;
     vector<userNode*> userVector;
 
     userNode* node = NULL;
@@ -60,6 +89,7 @@ int main(){
         cin >> auxN;
         cin >> auxP;
 
+        userVector[auxN-1]->id = auxN;
         userVector[auxN-1]->d = -1;
         userVector[auxN-1]->low = -1;
         userVector[auxN-1]->visited = 0;
@@ -69,7 +99,7 @@ int main(){
 
     for (int k = 0; k < p; k++){
       if(userVector[k]->d == -1){
-        Tarjan_Visit(userVector[k], L);
+        Tarjan_Visit(userVector[k], L, userVector);
       }
     }
 
