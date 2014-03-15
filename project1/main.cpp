@@ -22,12 +22,14 @@ class userNode{
 
 // apply Tarjan Algorithm to a node
 vector<list<int> > Tarjan_Visit(userNode* actual_node, list<int> L, vector<userNode*> user_vector){
- int visited = actual_node->visited;
+        int visited = actual_node->visited;
 
       userNode* v = NULL;
 
       vector<list<int> > SCC;
       SCC.reserve(n);
+
+
 
       actual_node->d = visited;
       actual_node->low = visited;
@@ -76,8 +78,10 @@ vector<list<int> > Tarjan_Visit(userNode* actual_node, list<int> L, vector<userN
           }
 
           SCC.push_back(people);
+           people.clear();
 
       }
+
 
       return SCC;
 
@@ -91,6 +95,8 @@ int main(){
 
     // list of nodes visited (empty)
     list<int> L;
+
+
 
     // users vector
     vector<userNode*> userVector;
@@ -109,6 +115,13 @@ int main(){
     for(int i = 0; i < n; i++){
         node = new userNode();
         userVector.push_back(node);
+
+        int id_aux = i;
+
+        userVector[i]->id = id_aux + 1;
+        userVector[i]->d = -1;
+        userVector[i]->low = -1;
+        userVector[i]->visited = 0;
     }
 
     // insert shares on users vector
@@ -119,13 +132,10 @@ int main(){
         cin >> auxN;
         cin >> auxP;
 
-        userVector[auxN-1]->id = auxN;
-        userVector[auxN-1]->d = -1;
-        userVector[auxN-1]->low = -1;
-        userVector[auxN-1]->visited = 0;
         userVector[auxN-1]->sharedList.push_back(auxP);
     }
 
+   
     //cout << "vector 0 id" << (userVector[0]->d) << "\n";
     //cout << "vector 1 id" << (userVector[1]->low) << "\n";
 
@@ -133,7 +143,7 @@ int main(){
 
     for (int k = 0; k < p; k++){
         if(userVector[k]->d == -1){
-            SCC_output = Tarjan_Visit(userVector[k], L, userVector);
+        //    SCC_output = Tarjan_Visit(userVector[k], L, userVector);
         }
     }
 
@@ -162,6 +172,10 @@ int main(){
     cout << n << "\n";
     cout << p << "\n"; */
 
+    L.clear();
+    userVector.clear();
+    SCC_output.clear();
+    delete node;
 
     return 0;
 }
