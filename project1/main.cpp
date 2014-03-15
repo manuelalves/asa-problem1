@@ -96,9 +96,9 @@ int main(){
 
 
     for (int k = 0; k < p; k++){
-      if(userVector[k]->d == -1){
-        Tarjan_Visit(userVector[k], L, userVector);
-      }
+        if(userVector[k]->d == -1){
+            Tarjan_Visit(userVector[k], L, userVector);
+        }
     }
 
 
