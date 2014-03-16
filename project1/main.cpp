@@ -22,7 +22,8 @@ class userNode{
 
 // apply Tarjan Algorithm to a node
 vector<list<int> > Tarjan_Visit(userNode* actual_node, list<int> L, vector<userNode*> user_vector){
-        int visited = actual_node->visited;
+
+      int visited = actual_node->visited;
 
       userNode* v = NULL;
 
@@ -50,8 +51,7 @@ vector<list<int> > Tarjan_Visit(userNode* actual_node, list<int> L, vector<userN
 
             list<int>::iterator pos;
             int shared_node = *adj;
-
-
+            
             v = user_vector[shared_node-1];  //ver se indices tao bem ou se -1
 
             pos = find(L.begin(), L.end(), shared_node);           //finds position of element v
@@ -67,15 +67,16 @@ vector<list<int> > Tarjan_Visit(userNode* actual_node, list<int> L, vector<userN
       }
 
 
-      if(actual_node->d == actual_node->low){
+     if(actual_node->d == actual_node->low){
 
           list<int> people;
 
-          while((actual_node->id) != (v->id)){
-              v->id= L.back();
-              people.push_back(v->id);
-              L.pop_back();
-          }
+        cout << "\n"<< "Actual Node" << (actual_node->id) << "V" << (v->id) << "\n";
+         //while((actual_node->id) != (v->id)){
+              //v->id= L.back();
+              //people.push_back(v->id);
+              //L.pop_back();
+          //}
 
           SCC.push_back(people);
            people.clear();
@@ -91,12 +92,8 @@ vector<list<int> > Tarjan_Visit(userNode* actual_node, list<int> L, vector<userN
 
 int main(){
 
-
-
     // list of nodes visited (empty)
     list<int> L;
-
-
 
     // users vector
     vector<userNode*> userVector;
@@ -108,8 +105,6 @@ int main(){
     // read first line input
     cin >> n;  //number of users
     cin >> p;  //number of shares
-
-
 
     // initialize users vector
     for(int i = 0; i < n; i++){
@@ -135,42 +130,19 @@ int main(){
         userVector[auxN-1]->sharedList.push_back(auxP);
     }
 
-
-    //cout << "vector 0 id" << (userVector[0]->d) << "\n";
-    //cout << "vector 1 id" << (userVector[1]->low) << "\n";
-
+    // allocate memory for a vector with n (number of users) positions
     SCC_output.reserve(n);
+
 
     for (int k = 0; k < p; k++){
         if(userVector[k]->d == -1){
-//            SCC_output = Tarjan_Visit(userVector[k], L, userVector);
+            SCC_output = Tarjan_Visit(userVector[k], L, userVector);
         }
     }
 
     // write output
-
     cout << SCC_output.size() << "\n";
     /*cout << p << "\n"; */
-
-    //
-
-
-    // test print
-    /*for (int z = 0; z < n; z++){
-        list<int> test = userVector[z];
-        list<int>::const_iterator pos;
-
-        for(pos=test.begin(); pos != test.end(); ++pos){
-            cout << z + 1 << ' ' << *pos << ' ';
-        }
-        cout << "\n";
-    }*/
-
-
-    // write output
-    /*cout << n << " " << p << "\n";
-    cout << n << "\n";
-    cout << p << "\n"; */
 
     L.clear();
     userVector.clear();
@@ -180,10 +152,25 @@ int main(){
     return 0;
 }
 
+// test print
+/*for (int z = 0; z < n; z++){
+    list<int> test = userVector[z];
+    list<int>::const_iterator pos;
+
+    for(pos=test.begin(); pos != test.end(); ++pos){
+        cout << z + 1 << ' ' << *pos << ' ';
+    }
+    cout << "\n";
+}*/
+
+
+// write output
+/*cout << n << " " << p << "\n";
+cout << n << "\n";
+cout << p << "\n"; */
+
+// Writing to a File
 /*
-
- // Writing to a File
-
  #include <fstream>
  ofstream outputFile;
  outputFile.open("output.txt");
