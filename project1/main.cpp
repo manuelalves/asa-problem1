@@ -135,7 +135,7 @@ int main(){
         userVector[auxN-1]->sharedList.push_back(auxP);
     }
 
-   
+
     //cout << "vector 0 id" << (userVector[0]->d) << "\n";
     //cout << "vector 1 id" << (userVector[1]->low) << "\n";
 
@@ -143,7 +143,7 @@ int main(){
 
     for (int k = 0; k < p; k++){
         if(userVector[k]->d == -1){
-        //    SCC_output = Tarjan_Visit(userVector[k], L, userVector);
+//            SCC_output = Tarjan_Visit(userVector[k], L, userVector);
         }
     }
 
