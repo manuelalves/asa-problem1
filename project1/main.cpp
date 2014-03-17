@@ -142,6 +142,7 @@ int main(){
     int number = 0;
 
 
+
 //tamanho do maior grupo maximo de pessoas que partilham informacao
     for(int itr = 0; itr < scComponents.size(); itr++){
         list<int>::iterator adj;
