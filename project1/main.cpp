@@ -2,7 +2,6 @@
 #include <list>
 #include <vector>
 #include <algorithm>
-//#include <stack>
 
 using namespace std;
 
@@ -11,12 +10,6 @@ int n = 0;
 
 // number of shares (p)
 int p = 0;
-
-vector<list<int> > SCC;
-
-list<int> L;
-
-
 
 class UserNode{
       public:
@@ -27,36 +20,22 @@ class UserNode{
           list<int> sharedList;
 };
 
-
 class Graph{
     public:
         int n;
         int p;
         int visited;
-        //list<int> L;
-    //    stack<int> L;   //pilha de nos
+        list<int> L;
+        vector<list<int> > SCC;
         vector<UserNode*> nodesVector;
 }graph;
 
 
-
-
-
-
 void Tarjan_Visit(int no){
-//    cout << "Tarjan_Visit: no " << no <<  "\n";
+
     UserNode* node = graph.nodesVector[no-1];
 
     int visited_aux = graph.visited;
-
-//    cout << "Tarjan_Visit visited:  " << graph.visited <<  "\n";
-
-
-//    graph.nodesVector[no-1]->totalVisited = graph.visited;
-
-//    cout << "Tarjan_Visit totalVisited:  " << graph.nodesVector[no-1]->totalVisited <<  "\n";
-
-
 
     node->d = visited_aux;
     node->low = visited_aux;
@@ -64,35 +43,28 @@ void Tarjan_Visit(int no){
     int minn = node->low;
     node->visit = 1;
 
-    //g.L.push(node->id);
-    L.push_back(node->id);
+    graph.L.push_back(node->id);
 
 
     list<int>::iterator adj;
 
+    // search the shared nodes of a node
     for(adj = node->sharedList.begin(); adj!= node->sharedList.end(); adj++){
         int adjNode = *adj;
         UserNode* shareNode = graph.nodesVector[adjNode-1];
 
-    //    cout << "Tarjan_Visit again:  " << shareNode->id <<  "\n";
-
-
         if(shareNode->visit == 0){
             Tarjan_Visit(shareNode->id);
-
         }
 
         if(shareNode->low < minn){
             minn = shareNode->low;
-
         }
-
     }
 
     if(minn < node-> low){
         node->low = minn;
         return;
-
     }
 
 
@@ -100,27 +72,18 @@ void Tarjan_Visit(int no){
     int v;
 
     do{
-        //v=g.L.top();
-
-
-        v=L.back();
-        L.pop_back();
-    //    g.L.pop();
+        v=graph.L.back();
+        graph.L.pop_back();
         componentList.push_back(v);
-     graph.nodesVector[v-1]->low = min(graph.nodesVector[v-1]->low, node->low);
-
+        graph.nodesVector[v-1]->low = min(graph.nodesVector[v-1]->low, node->low);
     } while (v != node->id);
 
-    SCC.push_back(componentList);
-
-
-
-
+    graph.SCC.push_back(componentList);
 }
 
-//devolve a lista de SCC de um grafo
-vector<list<int> > SCC_Tarjan(Graph g){
 
+//returns the list with the SCC of a grafo
+vector<list<int> > SCC_Tarjan(Graph g){
 
     for (int node = 0; node < g.p; node++){
         if(g.nodesVector[node]->d == -1){
@@ -130,10 +93,8 @@ vector<list<int> > SCC_Tarjan(Graph g){
         }
     }
 
-return SCC;
-
+return graph.SCC;
 }
-
 
 
 int main(){
@@ -148,7 +109,7 @@ int main(){
     graph.visited = 0;
     graph.nodesVector.reserve(n);
 
-//inicializa cada no do grafo
+// initialize each node of the graph
     for(int i = 0; i < n; i++){
 
         UserNode* node = new UserNode();
@@ -163,7 +124,7 @@ int main(){
         graph.nodesVector[i]->visit = 0;
     }
 
-//recebe input de nos partilhados com a pessoa
+//receive as input the shared nodes
     for (int j = 0; j < p; j++){
             int auxN= 0;
             int auxP = 0;
@@ -174,83 +135,69 @@ int main(){
             graph.nodesVector[auxN-1]->sharedList.push_back(auxP);
         }
 
-
-    /** print all strongly connected components **/
-
     vector<list<int> > scComponents = SCC_Tarjan(graph);
 
+    int max_groups = 0;
+
+    int number = 0;
 
 
-    int counter = 0;
-
-//IMPRIMIR VALORES DAS LISTAS
-
+//tamanho do maior grupo maximo de pessoas que partilham informacao
     for(int itr = 0; itr < scComponents.size(); itr++){
-    //    cout << "lista: " << itr + 1 << " tamanho: " <<  scComponents[itr].size() << "\n";
+        list<int>::iterator adj;
 
-    list<int>::iterator adj;
-    cout << "[ ";
+        int max_groups_aux = 0;
 
-    for(adj = scComponents[itr].begin(); adj!= scComponents[itr].end(); adj++){
-        cout << *(adj) << " ";
-
-        int a = *(adj) - 1;
-
-        cout << "d:" << graph.nodesVector[a]->d << " low:" << graph.nodesVector[a]->low << "  |";
-
-
-
- }
-
-
-
- cout << "] ";
-
- ///////////////////////////
-
-
-        int counter_aux = 0;
-            counter_aux = scComponents[itr].size();
-            if(counter_aux > counter){
-                counter = counter_aux;
+            max_groups_aux = scComponents[itr].size();
+            if(max_groups_aux > max_groups){
+                max_groups = max_groups_aux;
             }
 }
+
+
+    list<int> listNodes;
+
+
+//numero de grupos maximos de pessoas que partilham informacao apenas dentro do grupo
+    for(int itr = 0; itr < scComponents.size(); itr++){
+
+        list<int>::iterator adj;
+
+        for(adj = scComponents[itr].begin(); adj!= scComponents[itr].end(); adj++){
+
+           int a = *(adj) - 1;
+
+           UserNode *node = graph.nodesVector[a];
+
+           if(node->sharedList.size() > 0){ //have a list with shares
+
+                list<int>::iterator pos;
+                pos = find(scComponents[itr].begin(), scComponents[itr].end(), node->id);
+
+                if(*(pos) != 0){        //exists in a group with shares
+
+                    if(node->low == node->d){    //have low=d
+                        number++;
+                    }
+                }
+            }
+        }
+    }
+
+
         cout <<"\n";
 
         cout << "SCC:" << "\n";
+
+//numero de grupos maximos de pessoas que partilham informacao
         cout << scComponents.size() << " ";
 
-        cout << counter << "\n";
+//tamanho do maior grupo maximo de pessoas que partilham informacao
+        cout << max_groups << " ";
 
+//numero de grupos maximos de pessoas que partilham informacao apenas dentro do grupo
+        cout << number << "\n";
 
-
-
-
-//       System.out.println(scComponents);
-
-/*
-///IMPRIMIR///
-//////////////////////////////////
-    for(int a=0;a<n;a++){
-       cout <<  "\n";
-       cout << "imprimir vector" <<  "\n";
-       cout << "posicao vector: " << a <<  "\n";
-
-       cout << "id " << graph.nodesVector[a]->id <<  "\n";
-       cout << "d" << graph.nodesVector[a]->d <<  "\n";
-       cout << "low " << graph.nodesVector[a]->low <<  "\n";
-       cout << "visited " << graph.nodesVector[a]->visited <<  "\n";
-       list<int>::iterator adj;
-
-       for(adj = graph.nodesVector[a]->sharedList.begin(); adj!= graph.nodesVector[a]->sharedList.end(); adj++){
-               cout << "partilha com: " << *(adj)<<  "\n";
-
-        }
-
-    }
-
-//////////////////////////////////
-*/
 
 return 0;
 

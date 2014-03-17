@@ -73,6 +73,7 @@ class Tarjan
 
 
 
+
     /** main **/
     public static void main(String[] args)
     {
@@ -105,3 +106,33 @@ class Tarjan
            System.out.println(scComponents);
     }
 }
+
+
+
+
+
+
+/*
+//IMPRIMIR VALORES DAS LISTAS////////////////////////////////////////////////////////
+cout << "\n ";
+
+    for(int itr = 0; itr < scComponents.size(); itr++){
+    //    cout << "lista: " << itr + 1 << " tamanho: " <<  scComponents[itr].size() << "\n";
+
+    list<int>::iterator adj;
+
+    cout << "[ ";
+
+    for(adj = scComponents[itr].begin(); adj!= scComponents[itr].end(); adj++){
+        cout << *(adj) << " ";
+
+        int a = *(adj) - 1;
+
+        cout << "d:" << graph.nodesVector[a]->d << " low:" << graph.nodesVector[a]->low << "  |";
+ }
+
+
+ cout << "] " << "\n";
+
+ ////////////////////////////////////////////////////////////////////////////////////
+*/
