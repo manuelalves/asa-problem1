@@ -12,7 +12,7 @@ int n = 0;
 // number of shares (p)
 int p = 0;
 
-list<list<int> > SCC;
+vector<list<int> > SCC;
 
 
 class UserNode{
@@ -87,30 +87,26 @@ void Tarjan_Visit(int n, Graph g){
         list<int> componentList;
 
         do{
-            cout << "1 " << "\n";
 
         //    v = g.L.back();
         //    g.L.pop_back();
 
         v=g.L.top();
-        cout << "Tarjan_Visit pop " << v <<  "\n";
+        cout << " POP " << v <<  "\n";
 
 
-    g.L.pop();
+        g.L.pop();
 
-            cout << "2 " << "\n";
-
-            componentList.push_back(v);
-
-            cout << "3 " << "\n";
+        componentList.push_back(v);
 
 
-        }while (node->id != v);   // ver se e == ou !=
+    }while (node->id != v);   // ver se e == ou != AQUIIIIIII
 
         /////////
         list<int>::iterator ad;
-        for(ad = componentList.begin(); ad!= componentList.end(); ad++){
-                cout << "componentlist: " << "begin " << *(componentList.begin()) << " end " <<  *(componentList.end()) << " " << *(ad)<<  "\n";
+        for(ad = componentList.begin(); ad!= componentList.end(); ++ad){
+            //    cout << "componentlist: " << "begin " << *(componentList.begin()) << " end " <<  *(componentList.end()) << " " << *(ad)<<  "\n";
+            cout << "componentlist: " << " " << *(ad)<<  "\n";
 
          }
          /////////
@@ -124,7 +120,7 @@ void Tarjan_Visit(int n, Graph g){
 }
 
 //devolve a lista de SCC de um grafo
-list<list<int> > SCC_Tarjan(Graph g){
+vector<list<int> > SCC_Tarjan(Graph g){
 
 
     for (int node = 0; node < g.p; node++){
@@ -180,10 +176,39 @@ int main(){
 
     /** print all strongly connected components **/
 
-    list<list<int> > scComponents = SCC_Tarjan(graph);
+    vector<list<int> > scComponents = SCC_Tarjan(graph);
 
     cout << "SCC:" << "\n";
     cout << scComponents.size() << "\n";
+
+    int counter = 0;
+
+//IMPRIMIR VALORES DAS LISTAS
+
+    for(int itr = 0; itr < scComponents.size(); itr++){
+        cout << "lista: " << itr << " tamanho: " <<  scComponents[itr].size() << "\n";
+
+    list<int>::iterator adj;
+
+    for(adj = scComponents[itr].begin(); adj!= scComponents[itr].end(); adj++){
+        cout << " users: " << *(adj)<<  "\n";
+
+ }
+
+ ///////////////////////////
+
+
+        int counter_aux = 0;
+            counter_aux = scComponents[itr].size();
+            if(counter_aux > counter){
+                counter = counter_aux;
+            }
+}
+
+        cout << counter << "\n";
+
+
+
 
 
 //       System.out.println(scComponents);
