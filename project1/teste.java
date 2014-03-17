@@ -37,6 +37,9 @@ class Tarjan
 
         return sccComp;
     }
+
+
+
     /** function dfs **/
     public void dfs(int v)
     {
@@ -66,6 +69,10 @@ class Tarjan
         } while (w != v);
         sccComp.add(component);
     }
+
+
+
+
     /** main **/
     public static void main(String[] args)
     {

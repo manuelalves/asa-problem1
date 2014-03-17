@@ -2,6 +2,7 @@
 #include <list>
 #include <vector>
 #include <algorithm>
+#include <stack>
 
 using namespace std;
 
@@ -11,80 +12,128 @@ int n = 0;
 // number of shares (p)
 int p = 0;
 
-class userNode{
+list<list<int> > SCC;
+
+
+class UserNode{
       public:
           int id;
           int d;
           int low;
-          int visited;
+          int visit;
           list<int> sharedList;
 };
 
-// apply Tarjan Algorithm to a node
-vector<list<int> > Tarjan_Visit(userNode* actual_node, list<int> L, vector<userNode*> user_vector){
 
-      int visited = actual_node->visited;
-
-      userNode* v = NULL;
-
-      vector<list<int> > SCC;
-      SCC.reserve(n);
-
-
-
-      actual_node->d = visited;
-      actual_node->low = visited;
-      actual_node->visited = (visited + 1);
+class Graph{
+    public:
+        int n;
+        int p;
+        int visited;
+        stack<int> L;   //pilha de nos
+        vector<UserNode*> nodesVector;
+};
 
 
 
-      L.push_back(actual_node->id);
+void Tarjan_Visit(int n, Graph g){
+    cout << "Tarjan_Visit: no " << n <<  "\n";
+    UserNode* node = g.nodesVector[n-1];
 
+    int addVisit = g.visited;
 
+    node->d = addVisit;
+    node->low = addVisit;
+    g.visited = (addVisit + 1);
+    int min = node->low;
+    node->visit = 1;
 
-      list<int>::iterator adj;
+    g.L.push(node->id);
 
-      //userNode* copy_node = actual_node;
+    list<int>::iterator adj;
+    for(adj = node->sharedList.begin(); adj!= node->sharedList.end(); adj++){
 
-      //search in the adjacent nodes list of actual node
-      for(adj = actual_node->sharedList.begin(); adj!= actual_node->sharedList.end(); adj++){
+        int adjNode = *adj;
+        UserNode* shareNode = g.nodesVector[adjNode-1];
 
-            list<int>::iterator pos;
-            int shared_node = *adj;
-            
-            v = user_vector[shared_node-1];  //ver se indices tao bem ou se -1
+        cout << "Tarjan_Visit: adj " << adjNode <<  "\n";
 
-            pos = find(L.begin(), L.end(), shared_node);           //finds position of element v
+    //    list<int>::iterator existPos;
+    //    existPos = find(g.L.begin(), g.L.end(), n);           //finds position of element v
+    //    if(shareNode->d == -1 || existPos != g.L.end()){
 
+        if(shareNode->d == -1 || shareNode->visit == 1){
 
-          if((v->d == -1) || (pos != L.end())){
-               if(v->d == -1){
-                   Tarjan_Visit(v, L, user_vector);
+            if(shareNode->d == -1){
+
+                cout << "Tarjan_Visit again: shareNode->id  " << shareNode->id <<  "\n";
+                Tarjan_Visit(shareNode->id, g);
+
+            }
+            if(shareNode->low < min){
+                    min = shareNode->low;
+            }
+        }
     }
 
-              actual_node->low = min(actual_node->low, v->low);
-          }
-      }
+    if(min < node->low){
+        node->low = min;
+        return;
+
+    }
+
+    if(node->d == node->low){
+        int v;
+        list<int> componentList;
+
+        do{
+            cout << "1 " << "\n";
+
+        //    v = g.L.back();
+        //    g.L.pop_back();
+
+        v=g.L.top();
+        cout << "Tarjan_Visit pop " << v <<  "\n";
 
 
-     if(actual_node->d == actual_node->low){
+    g.L.pop();
 
-          list<int> people;
+            cout << "2 " << "\n";
 
-        cout << "\n"<< "Actual Node" << (actual_node->id) << "V" << (v->id) << "\n";
-         //while((actual_node->id) != (v->id)){
-              //v->id= L.back();
-              //people.push_back(v->id);
-              //L.pop_back();
-          //}
+            componentList.push_back(v);
 
-          SCC.push_back(people);
-           people.clear();
-
-      }
+            cout << "3 " << "\n";
 
 
-      return SCC;
+        }while (node->id != v);   // ver se e == ou !=
+
+        /////////
+        list<int>::iterator ad;
+        for(ad = componentList.begin(); ad!= componentList.end(); ad++){
+                cout << "componentlist: " << "begin " << *(componentList.begin()) << " end " <<  *(componentList.end()) << " " << *(ad)<<  "\n";
+
+         }
+         /////////
+
+       SCC.push_back(componentList);
+
+        //componentList.clear();
+
+    }
+
+}
+
+//devolve a lista de SCC de um grafo
+list<list<int> > SCC_Tarjan(Graph g){
+
+
+    for (int node = 0; node < g.p; node++){
+        if(g.nodesVector[node]->d == -1){
+            Tarjan_Visit(node+1, g);
+        }
+    }
+
+return SCC;
 
 }
 
@@ -92,90 +141,77 @@ vector<list<int> > Tarjan_Visit(userNode* actual_node, list<int> L, vector<userN
 
 int main(){
 
-    // list of nodes visited (empty)
-    list<int> L;
-
-    // users vector
-    vector<userNode*> userVector;
-
-    vector<list<int> > SCC_output;
-
-    userNode* node = NULL;
-
     // read first line input
     cin >> n;  //number of users
     cin >> p;  //number of shares
 
-    // initialize users vector
+    Graph graph;
+    graph.n = n;
+    graph.p = p;
+    graph.visited = 0;
+    graph.nodesVector.reserve(n);
+
+//inicializa cada no do grafo
     for(int i = 0; i < n; i++){
-        node = new userNode();
-        userVector.push_back(node);
+
+        UserNode* node = new UserNode();
+
+        graph.nodesVector.push_back(node);
 
         int id_aux = i;
 
-        userVector[i]->id = id_aux + 1;
-        userVector[i]->d = -1;
-        userVector[i]->low = -1;
-        userVector[i]->visited = 0;
+        graph.nodesVector[i]->id = (id_aux + 1);
+        graph.nodesVector[i]->d = -1;
+        graph.nodesVector[i]->low = -1;
+        graph.nodesVector[i]->visit = 0;
     }
 
-    // insert shares on users vector
+//recebe input de nos partilhados com a pessoa
     for (int j = 0; j < p; j++){
-        int auxN= 0;
-        int auxP = 0;
+            int auxN= 0;
+            int auxP = 0;
 
-        cin >> auxN;
-        cin >> auxP;
+            cin >> auxN;
+            cin >> auxP;
 
-        userVector[auxN-1]->sharedList.push_back(auxP);
-    }
-
-    // allocate memory for a vector with n (number of users) positions
-    SCC_output.reserve(n);
-
-
-    for (int k = 0; k < p; k++){
-        if(userVector[k]->d == -1){
-            SCC_output = Tarjan_Visit(userVector[k], L, userVector);
+            graph.nodesVector[auxN-1]->sharedList.push_back(auxP);
         }
-    }
-
-    // write output
-    cout << SCC_output.size() << "\n";
-    /*cout << p << "\n"; */
-
-    L.clear();
-    userVector.clear();
-    SCC_output.clear();
-    delete node;
-
-    return 0;
-}
-
-// test print
-/*for (int z = 0; z < n; z++){
-    list<int> test = userVector[z];
-    list<int>::const_iterator pos;
-
-    for(pos=test.begin(); pos != test.end(); ++pos){
-        cout << z + 1 << ' ' << *pos << ' ';
-    }
-    cout << "\n";
-}*/
 
 
-// write output
-/*cout << n << " " << p << "\n";
-cout << n << "\n";
-cout << p << "\n"; */
+    /** print all strongly connected components **/
 
-// Writing to a File
+    list<list<int> > scComponents = SCC_Tarjan(graph);
+
+    cout << "SCC:" << "\n";
+    cout << scComponents.size() << "\n";
+
+
+//       System.out.println(scComponents);
+
 /*
- #include <fstream>
- ofstream outputFile;
- outputFile.open("output.txt");
- outputFile << n << " " << p << endl;
- outputFile << n << endl;
- outputFile << p << endl;
- outputFile.close();
+///IMPRIMIR///
+//////////////////////////////////
+    for(int a=0;a<n;a++){
+       cout <<  "\n";
+       cout << "imprimir vector" <<  "\n";
+       cout << "posicao vector: " << a <<  "\n";
+
+       cout << "id " << graph.nodesVector[a]->id <<  "\n";
+       cout << "d" << graph.nodesVector[a]->d <<  "\n";
+       cout << "low " << graph.nodesVector[a]->low <<  "\n";
+       cout << "visited " << graph.nodesVector[a]->visited <<  "\n";
+       list<int>::iterator adj;
+
+       for(adj = graph.nodesVector[a]->sharedList.begin(); adj!= graph.nodesVector[a]->sharedList.end(); adj++){
+               cout << "partilha com: " << *(adj)<<  "\n";
+
+        }
+
+    }
+
+//////////////////////////////////
 */
+
+return 0;
+
+}
