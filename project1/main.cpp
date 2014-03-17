@@ -17,6 +17,7 @@ vector<list<int> > SCC;
 list<int> L;
 
 
+
 class UserNode{
       public:
           int id;
@@ -35,23 +36,32 @@ class Graph{
         //list<int> L;
     //    stack<int> L;   //pilha de nos
         vector<UserNode*> nodesVector;
-};
+}graph;
 
 
 
 
 
 
-void Tarjan_Visit(int no, Graph g){
-    cout << "Tarjan_Visit: no " << no <<  "\n";
-    UserNode* node = g.nodesVector[no-1];
+void Tarjan_Visit(int no){
+//    cout << "Tarjan_Visit: no " << no <<  "\n";
+    UserNode* node = graph.nodesVector[no-1];
 
-    int addVisit = g.visited;
+    int visited_aux = graph.visited;
 
-    node->d = addVisit;
-    node->low = addVisit;
-    g.visited = (addVisit + 1);
-    int min = node->low;
+//    cout << "Tarjan_Visit visited:  " << graph.visited <<  "\n";
+
+
+//    graph.nodesVector[no-1]->totalVisited = graph.visited;
+
+//    cout << "Tarjan_Visit totalVisited:  " << graph.nodesVector[no-1]->totalVisited <<  "\n";
+
+
+
+    node->d = visited_aux;
+    node->low = visited_aux;
+    graph.visited = (visited_aux + 1);
+    int minn = node->low;
     node->visit = 1;
 
     //g.L.push(node->id);
@@ -62,25 +72,25 @@ void Tarjan_Visit(int no, Graph g){
 
     for(adj = node->sharedList.begin(); adj!= node->sharedList.end(); adj++){
         int adjNode = *adj;
-        UserNode* shareNode = g.nodesVector[adjNode-1];
+        UserNode* shareNode = graph.nodesVector[adjNode-1];
 
-        cout << "Tarjan_Visit again:  " << shareNode->id <<  "\n";
+    //    cout << "Tarjan_Visit again:  " << shareNode->id <<  "\n";
 
 
         if(shareNode->visit == 0){
-            Tarjan_Visit(shareNode->id, g);
+            Tarjan_Visit(shareNode->id);
 
         }
 
-        if(shareNode->low < min){
-            min = shareNode->low;
+        if(shareNode->low < minn){
+            minn = shareNode->low;
 
         }
 
     }
 
-    if(min < node-> low){
-        node->low = min;
+    if(minn < node-> low){
+        node->low = minn;
         return;
 
     }
@@ -97,7 +107,7 @@ void Tarjan_Visit(int no, Graph g){
         L.pop_back();
     //    g.L.pop();
         componentList.push_back(v);
-        g.nodesVector[v-1]->low = g.n;
+     graph.nodesVector[v-1]->low = min(graph.nodesVector[v-1]->low, node->low);
 
     } while (v != node->id);
 
@@ -115,7 +125,7 @@ vector<list<int> > SCC_Tarjan(Graph g){
     for (int node = 0; node < g.p; node++){
         if(g.nodesVector[node]->d == -1){
             if(g.nodesVector[node]->visit == 0){
-                Tarjan_Visit(node+1, g);
+                Tarjan_Visit(node+1);
             }
         }
     }
@@ -132,7 +142,7 @@ int main(){
     cin >> n;  //number of users
     cin >> p;  //number of shares
 
-    Graph graph;
+    Graph g = graph;
     graph.n = n;
     graph.p = p;
     graph.visited = 0;
@@ -184,7 +194,16 @@ int main(){
     for(adj = scComponents[itr].begin(); adj!= scComponents[itr].end(); adj++){
         cout << *(adj) << " ";
 
+        int a = *(adj) - 1;
+
+        cout << "d:" << graph.nodesVector[a]->d << " low:" << graph.nodesVector[a]->low << "  |";
+
+
+
  }
+
+
+
  cout << "] ";
 
  ///////////////////////////
