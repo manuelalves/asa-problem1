@@ -2,7 +2,7 @@
 #include <list>
 #include <vector>
 #include <algorithm>
-#include <stack>
+//#include <stack>
 
 using namespace std;
 
@@ -13,6 +13,8 @@ int n = 0;
 int p = 0;
 
 vector<list<int> > SCC;
+
+list<int> L;
 
 
 class UserNode{
@@ -30,15 +32,19 @@ class Graph{
         int n;
         int p;
         int visited;
-        stack<int> L;   //pilha de nos
+        //list<int> L;
+    //    stack<int> L;   //pilha de nos
         vector<UserNode*> nodesVector;
 };
 
 
 
-void Tarjan_Visit(int n, Graph g){
-    cout << "Tarjan_Visit: no " << n <<  "\n";
-    UserNode* node = g.nodesVector[n-1];
+
+
+
+void Tarjan_Visit(int no, Graph g){
+    cout << "Tarjan_Visit: no " << no <<  "\n";
+    UserNode* node = g.nodesVector[no-1];
 
     int addVisit = g.visited;
 
@@ -48,74 +54,57 @@ void Tarjan_Visit(int n, Graph g){
     int min = node->low;
     node->visit = 1;
 
-    g.L.push(node->id);
+    //g.L.push(node->id);
+    L.push_back(node->id);
+
 
     list<int>::iterator adj;
-    for(adj = node->sharedList.begin(); adj!= node->sharedList.end(); adj++){
 
+    for(adj = node->sharedList.begin(); adj!= node->sharedList.end(); adj++){
         int adjNode = *adj;
         UserNode* shareNode = g.nodesVector[adjNode-1];
 
-        cout << "Tarjan_Visit: adj " << adjNode <<  "\n";
+        cout << "Tarjan_Visit again:  " << shareNode->id <<  "\n";
 
-    //    list<int>::iterator existPos;
-    //    existPos = find(g.L.begin(), g.L.end(), n);           //finds position of element v
-    //    if(shareNode->d == -1 || existPos != g.L.end()){
 
-        if(shareNode->d == -1 || shareNode->visit == 1){
+        if(shareNode->visit == 0){
+            Tarjan_Visit(shareNode->id, g);
 
-            if(shareNode->d == -1){
-
-                cout << "Tarjan_Visit again: shareNode->id  " << shareNode->id <<  "\n";
-                Tarjan_Visit(shareNode->id, g);
-
-            }
-            if(shareNode->low < min){
-                    min = shareNode->low;
-            }
         }
+
+        if(shareNode->low < min){
+            min = shareNode->low;
+
+        }
+
     }
 
-    if(min < node->low){
+    if(min < node-> low){
         node->low = min;
         return;
 
     }
 
-    if(node->d == node->low){
-        int v;
-        list<int> componentList;
 
-        do{
+    list<int> componentList;
+    int v;
 
-        //    v = g.L.back();
-        //    g.L.pop_back();
-
-        v=g.L.top();
-        cout << " POP " << v <<  "\n";
+    do{
+        //v=g.L.top();
 
 
-        g.L.pop();
-
+        v=L.back();
+        L.pop_back();
+    //    g.L.pop();
         componentList.push_back(v);
+        g.nodesVector[v-1]->low = g.n;
+
+    } while (v != node->id);
+
+    SCC.push_back(componentList);
 
 
-    }while (node->id != v);   // ver se e == ou != AQUIIIIIII
 
-        /////////
-        list<int>::iterator ad;
-        for(ad = componentList.begin(); ad!= componentList.end(); ++ad){
-            //    cout << "componentlist: " << "begin " << *(componentList.begin()) << " end " <<  *(componentList.end()) << " " << *(ad)<<  "\n";
-            cout << "componentlist: " << " " << *(ad)<<  "\n";
-
-         }
-         /////////
-
-       SCC.push_back(componentList);
-
-        //componentList.clear();
-
-    }
 
 }
 
@@ -125,7 +114,9 @@ vector<list<int> > SCC_Tarjan(Graph g){
 
     for (int node = 0; node < g.p; node++){
         if(g.nodesVector[node]->d == -1){
-            Tarjan_Visit(node+1, g);
+            if(g.nodesVector[node]->visit == 0){
+                Tarjan_Visit(node+1, g);
+            }
         }
     }
 
@@ -178,22 +169,23 @@ int main(){
 
     vector<list<int> > scComponents = SCC_Tarjan(graph);
 
-    cout << "SCC:" << "\n";
-    cout << scComponents.size() << "\n";
+
 
     int counter = 0;
 
 //IMPRIMIR VALORES DAS LISTAS
 
     for(int itr = 0; itr < scComponents.size(); itr++){
-        cout << "lista: " << itr << " tamanho: " <<  scComponents[itr].size() << "\n";
+    //    cout << "lista: " << itr + 1 << " tamanho: " <<  scComponents[itr].size() << "\n";
 
     list<int>::iterator adj;
+    cout << "[ ";
 
     for(adj = scComponents[itr].begin(); adj!= scComponents[itr].end(); adj++){
-        cout << " users: " << *(adj)<<  "\n";
+        cout << *(adj) << " ";
 
  }
+ cout << "] ";
 
  ///////////////////////////
 
@@ -204,6 +196,10 @@ int main(){
                 counter = counter_aux;
             }
 }
+        cout <<"\n";
+
+        cout << "SCC:" << "\n";
+        cout << scComponents.size() << " ";
 
         cout << counter << "\n";
 
