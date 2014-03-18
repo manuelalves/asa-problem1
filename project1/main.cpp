@@ -180,35 +180,6 @@ int main(){
     }
 
 
-    //IMPRIMIR VALORES DAS LISTAS
-
-        for(int itr = 0; itr < scComponents.size(); itr++){
-        //    cout << "lista: " << itr + 1 << " tamanho: " <<  scComponents[itr].size() << "\n";
-
-        list<int>::iterator adj;
-        cout << "[ ";
-
-        for(adj = scComponents[itr].begin(); adj!= scComponents[itr].end(); adj++){
-            cout << *(adj) << " ";
-
-            int a = *(adj) - 1;
-
-            cout << "d:" << graph->nodesVector[a]->d << " low:" << graph->nodesVector[a]->low << "  |";
-
-
-
-
-
-     }
-
-
-     cout << "] " << "\n";
-     }
-
-     ///////////////////////////
-
-
-
 
 //OUTPUT
             cout << "\n";
