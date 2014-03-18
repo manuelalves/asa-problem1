@@ -32,10 +32,14 @@ class Graph{
 
 
 void Tarjan_Visit(int no){
+    cout << "T1:" << "\n";
 
     UserNode* node = graph.nodesVector[no-1];
 
     int visited_aux = graph.visited;
+
+    cout << "no:" << node->id << " \n";
+
 
     node->d = visited_aux;
     node->low = visited_aux;
@@ -43,27 +47,47 @@ void Tarjan_Visit(int no){
     int minn = node->low;
     node->visit = 1;
 
-    graph.L.push_back(node->id);
+    graph.L.push_back(no);
 
 
     list<int>::iterator adj;
 
     // search the shared nodes of a node
     for(adj = node->sharedList.begin(); adj!= node->sharedList.end(); adj++){
+
+        cout << "T2:" << "\n";
+
+
         int adjNode = *adj;
         UserNode* shareNode = graph.nodesVector[adjNode-1];
 
+        cout << "share no:" << shareNode->id << " \n";
+
+
         if(shareNode->visit == 0){
+            cout << "tarjan visit share no:" << shareNode->id << " \n";
+            cout << "T3:" << "\n";
+
             Tarjan_Visit(shareNode->id);
+            cout << "T8:" << "\n";
+
         }
 
         if(shareNode->low < minn){
+            cout << "T4:" << "\n";
+
             minn = shareNode->low;
+            cout << "min:" << minn << " \n";
+
         }
     }
 
     if(minn < node-> low){
+        cout << "T5:" << "\n";
+
         node->low = minn;
+        cout << "node->low:" << node->low << " \n";
+
         return;
     }
 
@@ -71,14 +95,36 @@ void Tarjan_Visit(int no){
     list<int> componentList;
     int v;
 
+    list<int>::iterator ad;
+
+    for(ad = graph.L.begin(); ad!= graph.L.end(); ad++){
+        cout << "L: " << *(ad) << " \n";
+
+
+
+    }
+
     do{
+        cout << "T6:" << "\n";
+
         v=graph.L.back();
+        cout << "node pop:" << v << " \n";
+
         graph.L.pop_back();
         componentList.push_back(v);
-        graph.nodesVector[v-1]->low = min(graph.nodesVector[v-1]->low, node->low);
+        //graph.nodesVector[v-1]->low = min(graph.nodesVector[v-1]->low, node->low);
+        graph.nodesVector[v-1]->low = graph.n;
+
+        cout << "node id:" << node->id << " \n";
+
+
     } while (v != node->id);
 
+
+
     graph.SCC.push_back(componentList);
+    cout << "T7:" << "\n";
+
 }
 
 
@@ -92,7 +138,6 @@ vector<list<int> > SCC_Tarjan(Graph g){
             }
         }
     }
-
 return graph.SCC;
 }
 
@@ -137,9 +182,40 @@ int main(){
 
     vector<list<int> > scComponents = SCC_Tarjan(graph);
 
+
+
     int max_groups = 0;
 
     int number = 0;
+
+
+//IMPRIMIR VALORES DAS LISTAS
+
+    for(int itr = 0; itr < scComponents.size(); itr++){
+    //    cout << "lista: " << itr + 1 << " tamanho: " <<  scComponents[itr].size() << "\n";
+
+    list<int>::iterator adj;
+    cout << "[ ";
+
+    for(adj = scComponents[itr].begin(); adj!= scComponents[itr].end(); adj++){
+        cout << *(adj) << " ";
+
+        int a = *(adj) - 1;
+
+        cout << "d:" << graph.nodesVector[a]->d << " low:" << graph.nodesVector[a]->low << "  |";
+
+
+
+
+
+ }
+
+
+ cout << "] " << "\n";
+ }
+
+ ///////////////////////////
+
 
 
 
@@ -164,26 +240,53 @@ int main(){
 
         list<int>::iterator adj;
 
+        int sizee = scComponents[itr].size();
+
+        if(sizee == 1){
+            int a = scComponents[itr].front();
+
+            UserNode *node = graph.nodesVector[a - 1];
+
+            if(node->sharedList.size() == 0){ //have a list with private shares
+                number++;
+            }
+        }else{
+            int counter_aux = 0;
+            for(adj = scComponents[itr].begin(); adj!= scComponents[itr].end(); adj++){
+                    int k = *(adj) - 1;
+                    UserNode *node = graph.nodesVector[k];
+
+                    counter_aux = counter_aux + node->sharedList.size();
+            }
+
+            if(counter_aux == sizee){
+                number++;
+
+            }
+        }
+
+}
+
+    /*
+
         for(adj = scComponents[itr].begin(); adj!= scComponents[itr].end(); adj++){
 
            int a = *(adj) - 1;
 
            UserNode *node = graph.nodesVector[a];
 
-           if(node->sharedList.size() > 0){ //have a list with shares
+           if(node->sharedList.size() == 0){ //have a list with private shares
+               number++;
 
-                list<int>::iterator pos;
-                pos = find(scComponents[itr].begin(), scComponents[itr].end(), node->id);
-
-                if(*(pos) != 0){        //exists in a group with shares
-
-                    if(node->low == node->d){    //have low=d
-                        number++;
-                    }
-                }
-            }
+           }else{
+              int sizee = scComponents[itr].size();
+              if(sizee > 1){
+                 int counter_aux = 0;
+                     for()
+              }
+           }
         }
-    }
+    }*/
 
 
         cout <<"\n";
