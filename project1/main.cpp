@@ -32,13 +32,10 @@ class Graph{
 
 
 void Tarjan_Visit(int no){
-    cout << "T1:" << "\n";
 
     UserNode* node = graph.nodesVector[no-1];
 
     int visited_aux = graph.visited;
-
-    cout << "no:" << node->id << " \n";
 
 
     node->d = visited_aux;
@@ -55,38 +52,27 @@ void Tarjan_Visit(int no){
     // search the shared nodes of a node
     for(adj = node->sharedList.begin(); adj!= node->sharedList.end(); adj++){
 
-        cout << "T2:" << "\n";
-
-
         int adjNode = *adj;
         UserNode* shareNode = graph.nodesVector[adjNode-1];
 
-        cout << "share no:" << shareNode->id << " \n";
 
 
         if(shareNode->visit == 0){
-            cout << "tarjan visit share no:" << shareNode->id << " \n";
-            cout << "T3:" << "\n";
 
             Tarjan_Visit(shareNode->id);
-            cout << "T8:" << "\n";
 
         }
 
         if(shareNode->low < minn){
-            cout << "T4:" << "\n";
 
             minn = shareNode->low;
-            cout << "min:" << minn << " \n";
 
         }
     }
 
     if(minn < node-> low){
-        cout << "T5:" << "\n";
 
         node->low = minn;
-        cout << "node->low:" << node->low << " \n";
 
         return;
     }
@@ -105,17 +91,14 @@ void Tarjan_Visit(int no){
     }
 
     do{
-        cout << "T6:" << "\n";
 
         v=graph.L.back();
-        cout << "node pop:" << v << " \n";
 
         graph.L.pop_back();
         componentList.push_back(v);
         //graph.nodesVector[v-1]->low = min(graph.nodesVector[v-1]->low, node->low);
         graph.nodesVector[v-1]->low = graph.n;
 
-        cout << "node id:" << node->id << " \n";
 
 
     } while (v != node->id);
@@ -123,7 +106,6 @@ void Tarjan_Visit(int no){
 
 
     graph.SCC.push_back(componentList);
-    cout << "T7:" << "\n";
 
 }
 
@@ -131,7 +113,7 @@ void Tarjan_Visit(int no){
 //returns the list with the SCC of a grafo
 vector<list<int> > SCC_Tarjan(Graph g){
 
-    for (int node = 0; node < g.p; node++){
+    for (int node = 0; node < g.n; node++){
         if(g.nodesVector[node]->d == -1){
             if(g.nodesVector[node]->visit == 0){
                 Tarjan_Visit(node+1);
@@ -181,7 +163,6 @@ int main(){
         }
 
     vector<list<int> > scComponents = SCC_Tarjan(graph);
-
 
 
     int max_groups = 0;
