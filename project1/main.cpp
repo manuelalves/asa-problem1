@@ -2,288 +2,227 @@
 #include <list>
 #include <vector>
 #include <algorithm>
+#include <stack>
 
 using namespace std;
-
-// number of people (n)
-int n = 0;
-
-// number of shares (p)
-int p = 0;
 
 class UserNode{
       public:
           int id;
           int d;
           int low;
+          bool L_exist;
+
           int visit;
+          int low_visited;
           list<int> sharedList;
 };
 
 class Graph{
     public:
-        int n;
-        int p;
+        int V;
+        int E;
         int visited;
-        list<int> L;
+        //list<int> L;
+        stack<int> L;
         vector<list<int> > SCC;
         vector<UserNode*> nodesVector;
-}graph;
+};
 
 
-void Tarjan_Visit(int no){
-
-    UserNode* node = graph.nodesVector[no-1];
-
-    int visited_aux = graph.visited;
 
 
-    node->d = visited_aux;
-    node->low = visited_aux;
-    graph.visited = (visited_aux + 1);
-    int minn = node->low;
-    node->visit = 1;
+void Tarjan_Visit(int no, Graph* g){
 
-    graph.L.push_back(no);
+    UserNode* node = g->nodesVector[no-1];
 
+    node->d = g->visited;
+    node->low = g->visited;
+
+    g->visited = (g->visited + 1);
+
+    (g->L).push(node->id);
+
+    node->L_exist = true;
 
     list<int>::iterator adj;
+
+
 
     // search the shared nodes of a node
     for(adj = node->sharedList.begin(); adj!= node->sharedList.end(); adj++){
 
-        int adjNode = *adj;
-        UserNode* shareNode = graph.nodesVector[adjNode-1];
+        int adjNode = *(adj);
 
+        UserNode* shareNode = g->nodesVector[adjNode-1];
 
-
-        if(shareNode->visit == 0){
-
-            Tarjan_Visit(shareNode->id);
-
+        if(shareNode->d == -1){
+            Tarjan_Visit(shareNode->id, g);
+            node->low = min(shareNode->low, node->low);
         }
-
-        if(shareNode->low < minn){
-
-            minn = shareNode->low;
-
-        }
-    }
-
-    if(minn < node-> low){
-
-        node->low = minn;
-
-        return;
-    }
-
-
-    list<int> componentList;
-    int v;
-
-    list<int>::iterator ad;
-
-    for(ad = graph.L.begin(); ad!= graph.L.end(); ad++){
-        cout << "L: " << *(ad) << " \n";
-
-
-
-    }
-
-    do{
-
-        v=graph.L.back();
-
-        graph.L.pop_back();
-        componentList.push_back(v);
-        //graph.nodesVector[v-1]->low = min(graph.nodesVector[v-1]->low, node->low);
-        graph.nodesVector[v-1]->low = graph.n;
-
-
-
-    } while (v != node->id);
-
-
-
-    graph.SCC.push_back(componentList);
-
-}
-
-
-//returns the list with the SCC of a grafo
-vector<list<int> > SCC_Tarjan(Graph g){
-
-    for (int node = 0; node < g.n; node++){
-        if(g.nodesVector[node]->d == -1){
-            if(g.nodesVector[node]->visit == 0){
-                Tarjan_Visit(node+1);
+        else{
+            if(shareNode->L_exist == true){
+                node->low = min(node->low, shareNode->d);
             }
         }
     }
-return graph.SCC;
+
+    if(node->low == node->d){
+
+        list<int> componentList;
+        int w;
+
+        do{
+            w = (g->L).top();
+
+            (g->L).pop();
+
+            UserNode* w_Node = g->nodesVector[w-1];
+
+            w_Node->L_exist = false;
+
+            componentList.push_back(w);
+
+        }while(w != node->id);
+
+        g->SCC.push_back(componentList);
+    }
+
 }
 
 
+
+//returns the list with the SCC of a grafo
+vector<list<int> > SCC_Tarjan(Graph* g){
+
+    if(!(g->L).empty()){
+        (g->L).pop();
+    }
+
+    g->visited = 0;
+
+
+    for (int node = 0; node < g->V; node++){
+        if(g->nodesVector[node]->d == -1){
+                Tarjan_Visit(node+1, g);
+
+        }
+    }
+
+return g->SCC;
+}
+
+
+
+
+
 int main(){
+
+    int n;
+
+    int p;
 
     // read first line input
     cin >> n;  //number of users
     cin >> p;  //number of shares
 
-    Graph g = graph;
-    graph.n = n;
-    graph.p = p;
-    graph.visited = 0;
-    graph.nodesVector.reserve(n);
+    Graph* graph = new Graph();
 
-// initialize each node of the graph
-    for(int i = 0; i < n; i++){
+    graph->V = n;
+    graph->E = p;
+    graph->nodesVector.reserve(n);
+
+
+
+    // initialize each node of the graph
+    for(int i = 0; i < graph->V; i++){
 
         UserNode* node = new UserNode();
 
-        graph.nodesVector.push_back(node);
+        graph->nodesVector.push_back(node);
 
         int id_aux = i;
 
-        graph.nodesVector[i]->id = (id_aux + 1);
-        graph.nodesVector[i]->d = -1;
-        graph.nodesVector[i]->low = -1;
-        graph.nodesVector[i]->visit = 0;
+        graph->nodesVector[i]->id = (id_aux + 1);
+        graph->nodesVector[i]->d = -1;
+        graph->nodesVector[i]->low = -1;
     }
 
-//receive as input the shared nodes
-    for (int j = 0; j < p; j++){
-            int auxN= 0;
-            int auxP = 0;
+    for (int j = 0; j < graph->E; j++){
 
-            cin >> auxN;
-            cin >> auxP;
+        int user= 0;
+        int share = 0;
 
-            graph.nodesVector[auxN-1]->sharedList.push_back(auxP);
-        }
+        cin >> user;
+        cin >> share;
+
+        graph->nodesVector[user-1]->sharedList.push_back(share);
+    }
+
 
     vector<list<int> > scComponents = SCC_Tarjan(graph);
 
 
+
+    //tamanho do maior grupo maximo de pessoas que partilham informacao
+
     int max_groups = 0;
 
-    int number = 0;
+        for(int itr = 0; itr < scComponents.size(); itr++){
+            list<int>::iterator adj;
+
+            int max_groups_aux = 0;
+
+                max_groups_aux = scComponents[itr].size();
+                if(max_groups_aux > max_groups){
+                    max_groups = max_groups_aux;
+                }
+    }
 
 
-//IMPRIMIR VALORES DAS LISTAS
+    //IMPRIMIR VALORES DAS LISTAS
 
-    for(int itr = 0; itr < scComponents.size(); itr++){
-    //    cout << "lista: " << itr + 1 << " tamanho: " <<  scComponents[itr].size() << "\n";
-
-    list<int>::iterator adj;
-    cout << "[ ";
-
-    for(adj = scComponents[itr].begin(); adj!= scComponents[itr].end(); adj++){
-        cout << *(adj) << " ";
-
-        int a = *(adj) - 1;
-
-        cout << "d:" << graph.nodesVector[a]->d << " low:" << graph.nodesVector[a]->low << "  |";
-
-
-
-
-
- }
-
-
- cout << "] " << "\n";
- }
-
- ///////////////////////////
-
-
-
-
-//tamanho do maior grupo maximo de pessoas que partilham informacao
-    for(int itr = 0; itr < scComponents.size(); itr++){
-        list<int>::iterator adj;
-
-        int max_groups_aux = 0;
-
-            max_groups_aux = scComponents[itr].size();
-            if(max_groups_aux > max_groups){
-                max_groups = max_groups_aux;
-            }
-}
-
-
-    list<int> listNodes;
-
-
-//numero de grupos maximos de pessoas que partilham informacao apenas dentro do grupo
-    for(int itr = 0; itr < scComponents.size(); itr++){
+        for(int itr = 0; itr < scComponents.size(); itr++){
+        //    cout << "lista: " << itr + 1 << " tamanho: " <<  scComponents[itr].size() << "\n";
 
         list<int>::iterator adj;
-
-        int sizee = scComponents[itr].size();
-
-        if(sizee == 1){
-            int a = scComponents[itr].front();
-
-            UserNode *node = graph.nodesVector[a - 1];
-
-            if(node->sharedList.size() == 0){ //have a list with private shares
-                number++;
-            }
-        }else{
-            int counter_aux = 0;
-            for(adj = scComponents[itr].begin(); adj!= scComponents[itr].end(); adj++){
-                    int k = *(adj) - 1;
-                    UserNode *node = graph.nodesVector[k];
-
-                    counter_aux = counter_aux + node->sharedList.size();
-            }
-
-            if(counter_aux == sizee){
-                number++;
-
-            }
-        }
-
-}
-
-    /*
+        cout << "[ ";
 
         for(adj = scComponents[itr].begin(); adj!= scComponents[itr].end(); adj++){
+            cout << *(adj) << " ";
 
-           int a = *(adj) - 1;
+            int a = *(adj) - 1;
 
-           UserNode *node = graph.nodesVector[a];
-
-           if(node->sharedList.size() == 0){ //have a list with private shares
-               number++;
-
-           }else{
-              int sizee = scComponents[itr].size();
-              if(sizee > 1){
-                 int counter_aux = 0;
-                     for()
-              }
-           }
-        }
-    }*/
+            cout << "d:" << graph->nodesVector[a]->d << " low:" << graph->nodesVector[a]->low << "  |";
 
 
-        cout <<"\n";
-
-        cout << "SCC:" << "\n";
-
-//numero de grupos maximos de pessoas que partilham informacao
-        cout << scComponents.size() << " ";
-
-//tamanho do maior grupo maximo de pessoas que partilham informacao
-        cout << max_groups << " ";
-
-//numero de grupos maximos de pessoas que partilham informacao apenas dentro do grupo
-        cout << number << "\n";
 
 
-return 0;
+
+     }
+
+
+     cout << "] " << "\n";
+     }
+
+     ///////////////////////////
+
+
+
+
+//OUTPUT
+            cout << "\n";
+
+    //numero de grupos maximos de pessoas que partilham informacao
+            cout << scComponents.size() << " ";
+
+    //tamanho do maior grupo maximo de pessoas que partilham informacao
+            cout << max_groups << " ";
+
+cout << "\n";
+
+
+
+
 
 }
