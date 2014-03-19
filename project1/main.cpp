@@ -13,9 +13,7 @@ class UserNode{
           int d;
           int low;
           bool L_exist;
-
           int visit;
-          int low_visited;
           list<int> sharedList;
 };
 
@@ -24,7 +22,6 @@ class Graph{
         int V;
         int E;
         int visited;
-
         stack<int> L;
         vector<list<int> > SCC;
         vector<UserNode*> nodesVector;
@@ -47,8 +44,6 @@ void Tarjan_Visit(int no, Graph* g){
     node->L_exist = true;
 
     list<int>::iterator adj;
-
-
 
     // search the shared nodes of a node
     for(adj = node->sharedList.begin(); adj!= node->sharedList.end(); adj++){
@@ -88,9 +83,7 @@ void Tarjan_Visit(int no, Graph* g){
 
         g->SCC.push_back(componentList);
     }
-
 }
-
 
 
 //returns the list with the SCC of a grafo
@@ -102,18 +95,13 @@ vector<list<int> > SCC_Tarjan(Graph* g){
 
     g->visited = 0;
 
-
     for (int node = 0; node < g->V; node++){
         if(g->nodesVector[node]->d == -1){
                 Tarjan_Visit(node+1, g);
-
         }
     }
-
 return g->SCC;
 }
-
-
 
 
 int main(){
@@ -164,7 +152,7 @@ int main(){
     //tamanho do maior grupo maximo de pessoas que partilham informacao
     int max_groups = 0;
 
-        for(int itr = 0; itr < scComponents.size(); itr++){
+        for(unsigned int itr = 0; itr < scComponents.size(); itr++){
             list<int>::iterator adj;
 
             int max_groups_aux = 0;
@@ -176,7 +164,7 @@ int main(){
     }
 
     //numero de grupos maximos de pessoas que partilham informacao apenas dentro do grupo
-    for(int itr = 0; itr < scComponents.size(); itr++){
+    for(unsigned int itr = 0; itr < scComponents.size(); itr++){
 
         int size_SCC = scComponents[itr].size();
 
@@ -218,7 +206,7 @@ int main(){
 
                     if( *(pos) != 0){
                         contain = 1;
-                        
+
                     }
                     if(*(pos) == 0){
                         contain = 0;
