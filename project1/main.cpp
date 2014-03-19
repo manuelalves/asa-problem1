@@ -3,6 +3,7 @@
 #include <vector>
 #include <algorithm>
 #include <stack>
+#include <stdio.h>
 
 using namespace std;
 
@@ -23,7 +24,7 @@ class Graph{
         int V;
         int E;
         int visited;
-        //list<int> L;
+
         stack<int> L;
         vector<list<int> > SCC;
         vector<UserNode*> nodesVector;
@@ -118,13 +119,12 @@ return g->SCC;
 
 int main(){
 
-    int n;
-
-    int p;
+    int n=0;
+    int p=0;
+    int number=0;
 
     // read first line input
-    cin >> n;  //number of users
-    cin >> p;  //number of shares
+    scanf ("%d %d",&n,&p);
 
     Graph* graph = new Graph();
 
@@ -153,9 +153,7 @@ int main(){
         int user= 0;
         int share = 0;
 
-        cin >> user;
-        cin >> share;
-
+        scanf ("%d %d",&user, &share);
         graph->nodesVector[user-1]->sharedList.push_back(share);
     }
 
@@ -168,7 +166,7 @@ int main(){
 
     int max_groups = 0;
 
-        for(int itr = 0; itr < scComponents.size(); itr++){
+        for(unsigned int itr = 0; itr < scComponents.size(); itr++){
             list<int>::iterator adj;
 
             int max_groups_aux = 0;
@@ -181,19 +179,97 @@ int main(){
 
 
 
-//OUTPUT
-            cout << "\n";
+    //numero de grupos maximos de pessoas que partilham informacao apenas dentro do grupo
+    for(unsigned int itr = 0; itr < scComponents.size(); itr++){
 
+        list<int>::iterator adj;
+
+        int sizee = scComponents[itr].size();
+
+        if(sizee == 1){
+            int a = scComponents[itr].front();
+
+            UserNode *node = graph->nodesVector[a - 1];
+
+            if(node->sharedList.size() == 0 || node->sharedList.front() == a){ //have a list with private shares
+                number++;
+            }
+        }else{
+            int counter_aux = 0;
+            for(adj = scComponents[itr].begin(); adj!= scComponents[itr].end(); adj++){
+                    int k = *(adj) - 1;
+                    UserNode *node = graph->nodesVector[k];
+
+                    counter_aux = counter_aux + node->sharedList.size();
+            }
+
+            if(counter_aux == sizee){
+                number++;
+
+            }
+        }
+
+    }
+
+    //numero de grupos maximos de pessoas que partilham informacao apenas dentro do grupo
+/*    for(unsigned int itr = 0; itr < scComponents.size(); itr++){
+
+        int rec_number = -1;
+        int equal_variable = 1;
+
+        list<int>::iterator adj;
+
+        int sizee = scComponents[itr].size();
+
+        if(sizee == 1){
+            int a = scComponents[itr].front();
+
+            UserNode *node = graph->nodesVector[a - 1];
+
+            if(node->sharedList.size() == 0 || node->sharedList.front() == a){ //have a list with private shares
+                number++;
+            }
+            else{
+                if(rec_number == -1)
+                    rec_number = node->low;
+                else{
+                    if(rec_number != node->low && equal_variable == 0){
+                        equal_variable = 0;
+                        break;
+                    }
+                }
+            }
+        }else{
+
+            for(adj = scComponents[itr].begin(); adj!= scComponents[itr].end(); adj++){
+                    int k = *(adj) - 1;
+                    UserNode *node = graph->nodesVector[k];
+
+                    if(rec_number == -1)
+                        rec_number = node->low;
+                    else{
+                        if(rec_number != node->low && equal_variable == 0){
+                            equal_variable = 0;
+                            break;
+                        }
+                    }
+            }
+
+            if(equal_variable){
+                number++;
+
+            }
+        }
+
+    }*/
+
+//OUTPUT
     //numero de grupos maximos de pessoas que partilham informacao
-            cout << scComponents.size() << " ";
+            cout << scComponents.size() << "\n";
 
     //tamanho do maior grupo maximo de pessoas que partilham informacao
-            cout << max_groups << " ";
+            cout << max_groups << "\n";
 
-cout << "\n";
-
-
-
-
-
+    //numero de grupos maximos de pessoas que partilham informacao apenas dentro do grupo
+            cout << number << "\n";
 }
