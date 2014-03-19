@@ -116,7 +116,6 @@ return g->SCC;
 
 
 
-
 int main(){
 
     int n=0;
@@ -163,10 +162,9 @@ int main(){
 
 
     //tamanho do maior grupo maximo de pessoas que partilham informacao
-
     int max_groups = 0;
 
-        for(unsigned int itr = 0; itr < scComponents.size(); itr++){
+        for(int itr = 0; itr < scComponents.size(); itr++){
             list<int>::iterator adj;
 
             int max_groups_aux = 0;
@@ -177,91 +175,62 @@ int main(){
                 }
     }
 
-
-
     //numero de grupos maximos de pessoas que partilham informacao apenas dentro do grupo
-    for(unsigned int itr = 0; itr < scComponents.size(); itr++){
+    for(int itr = 0; itr < scComponents.size(); itr++){
 
-        list<int>::iterator adj;
+        int size_SCC = scComponents[itr].size();
 
-        int sizee = scComponents[itr].size();
+        list<int> lista = scComponents[itr];
 
-        if(sizee == 1){
-            int a = scComponents[itr].front();
+        if(size_SCC == 1){
+            int no_id = lista.front();
+            UserNode *node = graph->nodesVector[no_id - 1];
 
-            UserNode *node = graph->nodesVector[a - 1];
-
-            if(node->sharedList.size() == 0 || node->sharedList.front() == a){ //have a list with private shares
+            if(node->sharedList.size() == 0){
                 number++;
             }
-        }else{
-            int counter_aux = 0;
-            for(adj = scComponents[itr].begin(); adj!= scComponents[itr].end(); adj++){
-                    int k = *(adj) - 1;
-                    UserNode *node = graph->nodesVector[k];
 
-                    counter_aux = counter_aux + node->sharedList.size();
-            }
-
-            if(counter_aux == sizee){
+            if(node->sharedList.front() == node->id){
                 number++;
-
             }
         }
 
-    }
+        if(size_SCC > 1){
 
-    //numero de grupos maximos de pessoas que partilham informacao apenas dentro do grupo
-/*    for(unsigned int itr = 0; itr < scComponents.size(); itr++){
+            int contain = 0;
 
-        int rec_number = -1;
-        int equal_variable = 1;
+            int root = lista.front(); //ver o q devolve qd chega ao fim
+            UserNode *node = graph->nodesVector[root - 1];
 
-        list<int>::iterator adj;
+            list<int>::iterator h;
 
-        int sizee = scComponents[itr].size();
+            for(h = scComponents[itr].begin() ; h != scComponents[itr].end(); h++){
 
-        if(sizee == 1){
-            int a = scComponents[itr].front();
+                list<int>::iterator adj;
 
-            UserNode *node = graph->nodesVector[a - 1];
+                for(adj = node->sharedList.begin(); adj!= node->sharedList.end(); adj++){//para cada no partilhado do no actual
+                    int id = *(adj);
+                    UserNode *share = graph->nodesVector[id-1];
 
-            if(node->sharedList.size() == 0 || node->sharedList.front() == a){ //have a list with private shares
-                number++;
-            }
-            else{
-                if(rec_number == -1)
-                    rec_number = node->low;
-                else{
-                    if(rec_number != node->low && equal_variable == 0){
-                        equal_variable = 0;
+                    list<int>::iterator pos;
+
+                    pos = find(lista.begin(), lista.end(), share->id);
+
+                    if( *(pos) != 0){
+                        contain = 1;
+                        
+                    }
+                    if(*(pos) == 0){
+                        contain = 0;
                         break;
+
                     }
                 }
             }
-        }else{
-
-            for(adj = scComponents[itr].begin(); adj!= scComponents[itr].end(); adj++){
-                    int k = *(adj) - 1;
-                    UserNode *node = graph->nodesVector[k];
-
-                    if(rec_number == -1)
-                        rec_number = node->low;
-                    else{
-                        if(rec_number != node->low && equal_variable == 0){
-                            equal_variable = 0;
-                            break;
-                        }
-                    }
-            }
-
-            if(equal_variable){
-                number++;
-
-            }
+            if(contain == 1){number++;}
         }
+    }
 
-    }*/
 
 //OUTPUT
     //numero de grupos maximos de pessoas que partilham informacao
