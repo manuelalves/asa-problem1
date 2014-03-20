@@ -196,13 +196,13 @@ int main(){
         }
     }
 
-//OUTPUT
+    //OUTPUT
     //numero de grupos maximos de pessoas que partilham informacao
-            cout << scComponents.size() << "\n";
+    cout << scComponents.size() << "\n";
 
     //tamanho do maior grupo maximo de pessoas que partilham informacao
-            cout << max_groups << "\n";
+    cout << max_groups << "\n";
 
     //numero de grupos maximos de pessoas que partilham informacao apenas dentro do grupo
-            cout << number << "\n";
+    cout << number << "\n";
 }
