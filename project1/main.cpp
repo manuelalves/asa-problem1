@@ -27,9 +27,6 @@ class Graph{
         vector<UserNode*> nodesVector;
 };
 
-
-
-
 void Tarjan_Visit(int no, Graph* g){
 
     UserNode* node = g->nodesVector[no-1];
@@ -100,7 +97,7 @@ vector<list<int> > SCC_Tarjan(Graph* g){
                 Tarjan_Visit(node+1, g);
         }
     }
-return g->SCC;
+    return g->SCC;
 }
 
 
@@ -118,8 +115,6 @@ int main(){
     graph->V = n;
     graph->E = p;
     graph->nodesVector.reserve(n);
-
-
 
     // initialize each node of the graph
     for(int i = 0; i < graph->V; i++){
@@ -144,10 +139,7 @@ int main(){
         graph->nodesVector[user-1]->sharedList.push_back(share);
     }
 
-
     vector<list<int> > scComponents = SCC_Tarjan(graph);
-
-
 
     //tamanho do maior grupo maximo de pessoas que partilham informacao
     int max_groups = 0;
@@ -163,62 +155,46 @@ int main(){
                 }
     }
 
+
     //numero de grupos maximos de pessoas que partilham informacao apenas dentro do grupo
     for(unsigned int itr = 0; itr < scComponents.size(); itr++){
 
-        int size_SCC = scComponents[itr].size();
+        list<int>::iterator adj;
 
-        list<int> lista = scComponents[itr];
+        int sizee = scComponents[itr].size();
 
-        if(size_SCC == 1){
-            int no_id = lista.front();
-            UserNode *node = graph->nodesVector[no_id - 1];
+        if(scComponents.size() == 1){
+            number ++;
+        }else{
 
-            if(node->sharedList.size() == 0){
-                number++;
-            }
+            if(sizee == 1){
+                int a = scComponents[itr].front();
 
-            if(node->sharedList.front() == node->id){
-                number++;
-            }
-        }
+                UserNode *node = graph->nodesVector[a - 1];
 
-        if(size_SCC > 1){
-
-            int contain = 0;
-
-            int root = lista.front(); //ver o q devolve qd chega ao fim
-            UserNode *node = graph->nodesVector[root - 1];
-
-            list<int>::iterator h;
-
-            for(h = scComponents[itr].begin() ; h != scComponents[itr].end(); h++){
-
-                list<int>::iterator adj;
-
-                for(adj = node->sharedList.begin(); adj!= node->sharedList.end(); adj++){//para cada no partilhado do no actual
-                    int id = *(adj);
-                    UserNode *share = graph->nodesVector[id-1];
-
-                    list<int>::iterator pos;
-
-                    pos = find(lista.begin(), lista.end(), share->id);
-
-                    if( *(pos) != 0){
-                        contain = 1;
-
-                    }
-                    if(*(pos) == 0){
-                        contain = 0;
-                        break;
-
+                if(node->sharedList.size() == 0){ //have a list with private shares
+                    number++;
+                }else{
+                    if(node->sharedList.front() == node->id){
+                        number++;
                     }
                 }
+            }else{
+                int counter_aux = 0;
+                for(adj = scComponents[itr].begin(); adj!= scComponents[itr].end(); adj++){
+                        int k = *(adj) - 1;
+                        UserNode *node = graph->nodesVector[k];
+
+                        counter_aux = counter_aux + node->sharedList.size();
+                }
+
+                if(counter_aux == sizee){
+                    number++;
+
+                }
             }
-            if(contain == 1){number++;}
         }
     }
-
 
 //OUTPUT
     //numero de grupos maximos de pessoas que partilham informacao
